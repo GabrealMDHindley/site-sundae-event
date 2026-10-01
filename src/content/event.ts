@@ -10,7 +10,7 @@ export const EVENT = {
   dateLabel: "Thursday, October 8, 2026",
   timeLabel: "7:00 PM",
   startISO: "2026-10-08T19:00:00-07:00",
-  endISO: "2026-10-08T22:00:00-07:00",
+  endISO: "2026-10-08T22:30:00-07:00",
   venue: "The Courtyard at Shade Hotel",
   address: "1221 N Valley Dr, Manhattan Beach, CA 90266",
   venuePhone: "(310) 546-5560",
@@ -25,6 +25,15 @@ export const AGENDA = [
   { k: "Where the industry is heading", v: "Lead costs, conversion, dispositions and capital — and what operators are changing." },
   { k: "A stronger acquisition business", v: "How to build one in a harder market, straight from operators in the room." },
   { k: "Great food & drinks", v: "Dinner in the open-air Courtyard at Shade, under the string lights." },
+];
+
+// The event itinerary — the timing for the invitation (Sundae, 2026-10-01)
+export const TIMING = [
+  ["7:00 PM", "Cocktails & Passed Hors d'Oeuvres"],
+  ["7:35 PM", "Josh's Presentation"],
+  ["8:00 PM", "Dinner"],
+  ["9:15 PM", "Rooftop Cocktails"],
+  ["10:30 PM +", "Optional After Party"],
 ];
 
 export const WHO = [

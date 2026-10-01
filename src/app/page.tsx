@@ -4,7 +4,7 @@ import HeroMedia from "@/components/HeroMedia";
 import Countdown from "@/components/Countdown";
 import RsvpForm from "@/components/RsvpForm";
 import AddToCalendar from "@/components/AddToCalendar";
-import { AGENDA, BRING, DISCLAIMER, ENGINE, EVENT, FAQ, FIT, JOSH, STEPS, SUNDAE_FACTS, WHO, WHY } from "@/content/event";
+import { AGENDA, TIMING, BRING, DISCLAIMER, ENGINE, EVENT, FAQ, FIT, JOSH, STEPS, SUNDAE_FACTS, WHO, WHY } from "@/content/event";
 
 function Lines({ lines, className = "", accent }: { lines: string[]; className?: string; accent?: number }) {
   return (
@@ -100,6 +100,14 @@ export default function Page() {
                   </li>
                 ))}
               </ol>
+              <div className="mt-12" data-reveal>
+                <p className="kicker">The timing · Thursday, October 8</p>
+                <dl className="mt-5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-lg">
+                  {TIMING.map(([t, v]) => (
+                    <div key={t} className="contents"><dt className="display text-2xl text-gold">{t}</dt><dd className="self-center text-cream">{v}</dd></div>
+                  ))}
+                </dl>
+              </div>
             </div>
             <div className="relative">
               <div className="sticky top-28">

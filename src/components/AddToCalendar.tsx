@@ -1,5 +1,5 @@
 "use client";
-import { EVENT } from "@/content/event";
+import { EVENT, TIMING } from "@/content/event";
 
 const fmt = (iso: string) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 
@@ -9,11 +9,11 @@ export default function AddToCalendar({ className = "" }: { className?: string }
   g.searchParams.set("text", "Sundae — Private Dinner & Dialogue with Josh Stech");
   g.searchParams.set("dates", `${fmt(EVENT.startISO)}/${fmt(EVENT.endISO)}`);
   g.searchParams.set("location", `${EVENT.venue}, ${EVENT.address}`);
-  g.searchParams.set("details", "Private dinner for LA real estate operators. Seats are confirmed by the Sundae team.");
+  g.searchParams.set("details", `Private dinner for LA real estate operators. Seats are confirmed by the Sundae team.\n\n${TIMING.map(([t, v]) => `${t} — ${v}`).join("\n")}`);
   const ics = () => {
     const body = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Sundae//Dinner//EN", "BEGIN:VEVENT", `UID:sundae-la-1008@sundae.com`, `DTSTAMP:${fmt(new Date().toISOString())}`,
       `DTSTART:${fmt(EVENT.startISO)}`, `DTEND:${fmt(EVENT.endISO)}`, "SUMMARY:Sundae — Private Dinner & Dialogue with Josh Stech",
-      `LOCATION:${EVENT.venue}\\, ${EVENT.address.replace(/,/g, "\\,")}`, "DESCRIPTION:Private dinner for LA real estate operators.", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+      `LOCATION:${EVENT.venue}\\, ${EVENT.address.replace(/,/g, "\\,")}`, `DESCRIPTION:Private dinner for LA real estate operators.\\n\\n${TIMING.map(([t, v]) => `${t} — ${v}`).join("\\n")}`, "END:VEVENT", "END:VCALENDAR"].join("\r\n");
     const url = URL.createObjectURL(new Blob([body], { type: "text/calendar" }));
     const a = document.createElement("a"); a.href = url; a.download = "sundae-dinner-oct-8.ics"; a.click(); URL.revokeObjectURL(url);
   };
