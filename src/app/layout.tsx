@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 const title = "Private Dinner & Dialogue with Josh Stech — Sundae · Oct 8, Manhattan Beach";
 const description =
-  "Join Sundae Co-Founder & CEO Josh Stech and fellow LA real estate operators for dinner and a conversation about building a stronger acquisition business in a harder market. Thursday, Oct 8, 2026, 6 PM — The Courtyard at Shade Hotel, Manhattan Beach.";
+  "Join Sundae Co-Founder & CEO Josh Stech and fellow LA real estate operators for dinner and a conversation about building a stronger acquisition business in a harder market. Thursday, Oct 8, 2026, 7 PM — The Courtyard at Shade Hotel, Manhattan Beach.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://site-sundae-event.vercel.app"),

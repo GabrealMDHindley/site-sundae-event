@@ -73,7 +73,7 @@ export default function RsvpForm() {
           <p className="mt-4 max-w-xl text-muted">Seats are limited, so the Sundae team reviews every request. You&apos;ll hear from us by text or email with your confirmation and table details.</p>
         )}
         <div className="mt-8 border-t hairline pt-6">
-          <p className="text-sm text-muted">Thursday, October 8 · 6:00 PM · The Courtyard at Shade Hotel, Manhattan Beach</p>
+          <p className="text-sm text-muted">Thursday, October 8 · 7:00 PM · The Courtyard at Shade Hotel, Manhattan Beach</p>
           <AddToCalendar className="mt-4" />
         </div>
       </div>

@@ -75,7 +75,7 @@ export default function Page() {
           <div className="marquee">
             {[0, 1].map((k) => (
               <div key={k} className="flex shrink-0 items-center gap-10 pr-10">
-                {["Market trends", "Where the industry is heading", "A stronger acquisition business", "Dinner & drinks", "The Courtyard at Shade", "Thursday · Oct 8 · 6 PM", "Seats limited"].map((t) => (
+                {["Market trends", "Where the industry is heading", "A stronger acquisition business", "Dinner & drinks", "The Courtyard at Shade", "Thursday · Oct 8 · 7 PM", "Seats limited"].map((t) => (
                   <span key={t} className="display flex items-center gap-10 text-2xl text-cream/80">{t}<span className="h-2 w-2 rounded-full bg-red" /></span>
                 ))}
               </div>
@@ -109,7 +109,7 @@ export default function Page() {
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 grid grid-cols-2 gap-px bg-white/10 text-sm">
-                    {[["When", "Thu, Oct 8 · 6:00 PM"], ["Where", "The Courtyard at Shade"], ["Included", "Dinner & drinks"], ["Seats", "Limited · by request"]].map(([k, v]) => (
+                    {[["When", "Thu, Oct 8 · 7:00 PM"], ["Where", "The Courtyard at Shade"], ["Included", "Dinner & drinks"], ["Seats", "Limited · by request"]].map(([k, v]) => (
                       <div key={k} className="bg-ink/85 p-4 backdrop-blur"><div className="kicker !text-[.62rem] !text-muted">{k}</div><div className="display mt-1 text-xl">{v}</div></div>
                     ))}
                   </div>
