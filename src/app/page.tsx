@@ -320,7 +320,7 @@ export default function Page() {
               <div className="grid gap-6 sm:grid-cols-3">
                 <div><p className="kicker !text-muted">Address</p><p className="mt-2 text-lg">{EVENT.address}</p><a className="mt-1 inline-block text-sm text-gold underline underline-offset-4" href={EVENT.mapsUrl} target="_blank" rel="noopener">Get directions →</a></div>
                 <div><p className="kicker !text-muted">Parking</p><p className="mt-2 text-lg">Valet available at Shade Hotel</p></div>
-                <div><p className="kicker !text-muted">Hotel</p><p className="mt-2 text-lg"><a href="tel:+13105465560" className="hover:text-gold">{EVENT.venuePhone}</a></p></div>
+                <div><p className="kicker !text-muted">Hotel</p><p className="mt-2 text-lg"><a href="tel:+13105464995" className="hover:text-gold">{EVENT.venuePhone}</a></p></div>
               </div>
               <AddToCalendar />
             </div>

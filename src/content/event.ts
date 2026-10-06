@@ -13,7 +13,7 @@ export const EVENT = {
   endISO: "2026-10-08T21:15:00-07:00",
   venue: "The Courtyard at Shade Hotel",
   address: "1221 N Valley Dr, Manhattan Beach, CA 90266",
-  venuePhone: "(310) 546-5560",
+  venuePhone: "(310) 546-4995",
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=Shade+Hotel+Manhattan+Beach+1221+N+Valley+Dr",
   googleFormUrl: "https://docs.google.com/forms/d/e/1FAIpQLSf_Jok7JqPMSwvAwcz7nBbc5SsneB7QCKcuAf6mjHRlvYKPBg/viewform",
   googleFormFields: { name: "entry.1833881284", entity: "entry.1878309074", phone: "entry.2144827569" },

@@ -1,7 +1,7 @@
 # site-sundae-event
 
 One-page RSVP funnel for **Sundae's Private Dinner & Dialogue** with Josh Stech —
-Thursday, Oct 8, 2026, 6 PM, The Courtyard at Shade Hotel, Manhattan Beach.
+Thursday, Oct 8, 2026, 7:00 PM, The Courtyard at Shade Hotel, Manhattan Beach.
 
 - Next.js 16 (App Router) · Tailwind v4 · React Three Fiber (3D string lights) · GSAP ScrollTrigger + Lenis
 - Content: `src/content/event.ts` (every fact sourced from sundae.com, Sundae's flyer/RSVP form, Shade Hotel)
