@@ -1,51 +1,80 @@
 @import "tailwindcss";
 
+/* Sundae brand tokens (Creative Guidelines 2022; studio clients/sundae/BRAND-SPEC.md).
+   Only the brand palette and the two brand faces exist; Tailwind's default colors and fonts are
+   switched off so an off-brand class cannot compile into the page. */
 @theme {
-  --color-ink: #120d0f;
-  --color-ink-2: #1b1316;
-  --color-ink-3: #261c20;
-  --color-cream: #f6eee6;
-  --color-muted: #b9aca4;
-  --color-dim: #85776f;
-  --color-red: #db3d55;
-  --color-red-deep: #a3002d;
-  --color-gold: #e9b872;
-  --color-gold-soft: #f3d9a8;
-  --font-display: var(--font-barlow), "Barlow Condensed", system-ui, sans-serif;
-  --font-serif: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-red: #db3d55;   /* wordmark, accent bars, shapes, highlight boxes. Never text. */
+  --color-blue: #1c51a0;  /* buttons, links, chips, the feature band */
+  --color-ink: #4a4a4a;   /* all copy on light backgrounds */
+  --color-pink: #f4cccc;
+  --color-mist: #f4f7f9;
+  --color-gray: #e6e6e6;
+  --color-slate: #c9d2e0;
+  --font-*: initial;
+  --font-serif: var(--font-merriweather), Georgia, serif;
+  --font-sans: var(--font-lato), Arial, sans-serif;
+  /* body copy keeps line-height >= 1.6 (spec section 3); headings and chips set their own leading */
+  --text-base--line-height: 1.6;
+  --text-lg--line-height: 1.65;
+  --text-xl--line-height: 1.6;
 }
 
-html { background: var(--color-ink); color: var(--color-cream); }
-body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+html { background: var(--color-white); color: var(--color-ink); }
+body { font-family: var(--font-sans); font-size: 1.125rem; line-height: 1.65; -webkit-font-smoothing: antialiased; background: var(--color-white); }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
-::selection { background: var(--color-red); color: #fff; }
+::selection { background: var(--color-pink); color: var(--color-ink); }
 
 @layer components {
-.display { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; line-height: .92; letter-spacing: .005em; }
-.kicker { font-weight: 600; letter-spacing: .28em; text-transform: uppercase; font-size: .72rem; color: var(--color-gold); }
-.serif-i { font-family: var(--font-serif); font-style: italic; font-weight: 300; }
-.hairline { border-color: rgba(246, 238, 230, .14); }
-.grain::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .06; mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
-.btn { display: inline-flex; align-items: center; gap: .6rem; border-radius: 999px; padding: .95rem 1.6rem; font-weight: 600; font-size: .95rem; transition: transform .25s ease, background .25s ease, color .25s ease; white-space: nowrap; }
+/* Merriweather headline: mixed case, normal tracking, generous leading */
+.display { font-family: var(--font-serif); font-weight: 400; line-height: 1.2; letter-spacing: -.005em; }
+.display-b { font-family: var(--font-serif); font-weight: 700; line-height: 1.28; }
+/* Eyebrow / pre-header: Lato Bold, all caps, tracking 100 */
+.eyebrow { font-family: var(--font-sans); font-weight: 700; font-size: 1rem; line-height: 1.5; letter-spacing: .1em; text-transform: uppercase; }
+/* The deck's red vertical bar beside a headline */
+.bar { position: relative; padding-left: 1.15rem; }
+.bar::before { content: ""; position: absolute; left: 0; top: .14em; bottom: .14em; width: 6px; border-radius: 1px; background: var(--color-red); }
+.bar-white::before { background: var(--color-white); }
+/* Pink highlight under a phrase (gray text sits on it) */
+.hl { background-image: linear-gradient(transparent 58%, var(--color-pink) 58%, var(--color-pink) 94%, transparent 94%); padding: 0 .06em; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; border-radius: 999px; padding: .95rem 1.65rem; font-family: var(--font-sans); font-weight: 700; font-size: 1.0625rem; line-height: 1.2; letter-spacing: .01em; transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease; white-space: nowrap; }
 .btn:hover { transform: translateY(-2px); }
-.btn:focus-visible, a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
-.btn-red { background: var(--color-red); color: #fff; box-shadow: 0 10px 30px -10px rgba(219, 61, 85, .7); }
-.btn-red:hover { background: #e4506a; }
-.btn-ghost { border: 1px solid rgba(246, 238, 230, .35); color: var(--color-cream); }
-.btn-ghost:hover { border-color: var(--color-cream); }
-.card { background: linear-gradient(180deg, rgba(38, 28, 32, .85), rgba(27, 19, 22, .85)); border: 1px solid rgba(246, 238, 230, .1); border-radius: 1.4rem; }
-.marquee { display: flex; width: max-content; animation: marquee 38s linear infinite; }
+.btn-primary { background: var(--color-blue); color: var(--color-white); box-shadow: 0 10px 24px -14px rgba(28, 81, 160, .8); }
+.btn-primary:hover { box-shadow: 0 16px 30px -14px rgba(28, 81, 160, .85); }
+.btn-secondary { background: var(--color-white); color: var(--color-blue); box-shadow: inset 0 0 0 2px var(--color-blue); }
+.btn-secondary:hover { background: var(--color-mist); }
+.btn-white { background: var(--color-white); color: var(--color-blue); }
+/* disabled: a quiet gray fill with ink text (7:1), clearly not yet available */
+.btn:disabled { background: var(--color-gray); color: var(--color-ink); transform: none; cursor: not-allowed; box-shadow: none; }
+.btn:focus-visible, a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--color-blue); outline-offset: 3px; }
+.link { color: var(--color-blue); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.link:hover { text-decoration-thickness: 2px; }
+.card { background: var(--color-white); border: 1px solid var(--color-gray); border-radius: 12px; box-shadow: 0 1px 2px rgba(74, 74, 74, .05), 0 18px 40px -26px rgba(74, 74, 74, .35); }
+.marquee { display: flex; width: max-content; animation: marquee 44s linear infinite; }
 @keyframes marquee { to { transform: translateX(-50%); } }
-.field { width: 100%; background: rgba(18, 13, 15, .6); border: 1px solid rgba(246, 238, 230, .16); border-radius: .8rem; padding: .85rem 1rem; color: var(--color-cream); font-size: .98rem; }
-.field::placeholder { color: var(--color-dim); }
-.chip { border: 1px solid rgba(246, 238, 230, .2); border-radius: 999px; padding: .55rem 1rem; font-size: .88rem; cursor: pointer; transition: all .2s ease; user-select: none; }
-.chip[data-on="true"] { background: var(--color-red); border-color: var(--color-red); color: #fff; }
+.field { width: 100%; background: var(--color-white); border: 1px solid var(--color-ink); border-radius: 8px; padding: .8rem 1rem; color: var(--color-ink); font-size: 1.0625rem; line-height: 1.4; font-weight: 400; }
+.field:focus { outline: none; border-color: var(--color-blue); box-shadow: 0 0 0 3px rgba(28, 81, 160, .2); }
+.chip { background: var(--color-white); border: 1px solid var(--color-ink); border-radius: 999px; padding: .55rem 1.05rem; font-size: 1rem; line-height: 1.3; color: var(--color-ink); cursor: pointer; transition: background-color .2s ease, border-color .2s ease, color .2s ease; user-select: none; }
+.chip:hover { border-color: var(--color-blue); }
+.chip[data-on="true"] { background: var(--color-blue); border-color: var(--color-blue); color: var(--color-white); }
+/* The deck's 4×4 blue dot grid */
+.dots { background-image: radial-gradient(circle, var(--color-blue) 0 7px, transparent 7.5px); background-size: 28px 28px; }
+/* mobile sticky CTA steps aside while the RSVP form is on screen */
+[data-sticky-cta] { transition: transform .35s ease, opacity .35s ease; }
+[data-sticky-cta][data-hidden="true"] { transform: translateY(140%); opacity: 0; pointer-events: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .marquee { animation: none; }
   [data-reveal] { opacity: 1 !important; transform: none !important; }
+  [data-sticky-cta] { transition: none; }
+  [data-engine-dots] { display: none !important; }
+  /* no pinned sequence without motion: show the three engine cards as a plain stack */
+  section[data-engine] { height: auto !important; }
+  section[data-engine] .lg\:h-\[580px\] { height: auto !important; display: grid; gap: 1.25rem; }
+  [data-engine-card] { position: relative !important; inset: auto !important; }
+  section[data-engine] .lg\:py-0 { padding-top: 6rem; padding-bottom: 6rem; }
 }

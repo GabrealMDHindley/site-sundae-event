@@ -1,122 +1,122 @@
 "use client";
-import { useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
-// The Courtyard's signature: bistro string lights. Strands hang as catenaries at different
-// depths; bulbs glow with additive halos, sway gently and parallax with the pointer.
+// The Courtyard's signature: bistro string lights, drawn in the Sundae palette on a white ground.
+// Strands drop in from above the band as catenaries at different depths; glossy bulbs in blue,
+// slate and Sundae red sway gently and parallax with the pointer. No dark stage, no glow (BRAND-SPEC 1.5).
 
-function glowTexture() {
-  const c = document.createElement("canvas");
-  c.width = c.height = 128;
-  const g = c.getContext("2d")!;
-  const grd = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  grd.addColorStop(0, "rgba(255,236,190,1)");
-  grd.addColorStop(0.18, "rgba(255,206,130,.85)");
-  grd.addColorStop(0.45, "rgba(255,170,90,.22)");
-  grd.addColorStop(1, "rgba(255,150,80,0)");
-  g.fillStyle = grd;
-  g.fillRect(0, 0, 128, 128);
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
+const BLUE = "#1C51A0", SLATE = "#C9D2E0", RED = "#DB3D55", INK = "#4A4A4A";
+const CYCLE = [BLUE, SLATE, RED, SLATE];
+const CAM_Z = 6;
+const PX_PER_UNIT = 100; // at z = 0 one world unit is 100 CSS pixels, whatever the band's size
 
-type StrandDef = { y: number; z: number; sag: number; span: number; n: number; phase: number };
+// x1/x2: anchor x as a fraction of the visible width at that depth; lift: anchor height above the
+// band's top edge (world units); low: lowest point as a fraction of the visible height below the top.
+type StrandDef = { z: number; x1: number; x2: number; lift: number; low: number; gap: number; r: number; phase: number };
 
-function Strand({ def, tex, reduce }: { def: StrandDef; tex: THREE.Texture; reduce: boolean }) {
+const STRANDS: StrandDef[] = [
+  // two shallow back swags nested inside the front V's two bowls, so no strand crosses another
+  { z: -2.6, x1: -0.62, x2: 0.12, lift: 0.05, low: 0.22, gap: 0.78, r: 0.048, phase: 0.2 },
+  { z: -2.6, x1: 0.32, x2: 0.72, lift: 0.05, low: 0.18, gap: 0.78, r: 0.048, phase: 0.9 },
+  // front two strands are consecutive swags sharing one anchor (x 0.22) just above the band's top edge,
+  // festoon style, so they meet in a clean V under the nav instead of crossing
+  { z: -0.6, x1: -0.72, x2: 0.22, lift: 0.04, low: 0.72, gap: 0.66, r: 0.058, phase: 1.3 },
+  { z: 0.2, x1: 0.22, x2: 0.8, lift: 0.04, low: 0.6, gap: 0.66, r: 0.06, phase: 2.1 },
+];
+
+function Strand({ def, w, h, reduce }: { def: StrandDef; w: number; h: number; reduce: boolean }) {
   const group = useRef<THREE.Group>(null);
-  const halos = useRef<THREE.Sprite[]>([]);
-  const pts = useMemo(() => {
-    const arr: THREE.Vector3[] = [];
-    for (let i = 0; i <= 60; i++) {
-      const t = i / 60, x = (t - 0.5) * def.span;
-      const y = def.y - def.sag * (1 - Math.pow((t - 0.5) * 2, 2));
-      arr.push(new THREE.Vector3(x, y, def.z));
-    }
-    return arr;
-  }, [def]);
-  const bulbs = useMemo(() => {
-    const b: THREE.Vector3[] = [];
-    for (let i = 1; i < def.n; i++) {
-      const t = i / def.n, x = (t - 0.5) * def.span;
-      const y = def.y - def.sag * (1 - Math.pow((t - 0.5) * 2, 2)) - 0.09;
-      b.push(new THREE.Vector3(x, y, def.z));
-    }
-    return b;
-  }, [def]);
-  const line = useMemo(() => new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: "#2a2023", transparent: true, opacity: 0.75 })), [pts]);
+  // visible size at this strand's depth
+  const k = (CAM_Z - def.z) / CAM_Z, W = w * k, H = h * k;
+  const { tube, bulbs } = useMemo(() => {
+    const xa = def.x1 * W, xb = def.x2 * W, ya = H / 2 + def.lift, yl = H / 2 - def.low * H, sag = ya - yl;
+    const at = (t: number) => new THREE.Vector3(xa + (xb - xa) * t, ya - sag * (1 - Math.pow(t * 2 - 1, 2)), def.z);
+    const pts = Array.from({ length: 81 }, (_, i) => at(i / 80));
+    const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 160, 0.009, 6, false);
+    const n = Math.max(3, Math.round(Math.abs(xb - xa) / def.gap));
+    const bulbs = Array.from({ length: n - 1 }, (_, i) => at((i + 1) / n));
+    return { tube, bulbs };
+  }, [def, W, H]);
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
-    if (group.current && !reduce) group.current.rotation.z = Math.sin(t * 0.35 + def.phase) * 0.012;
-    halos.current.forEach((s, i) => {
-      if (!s) return;
-      const f = reduce ? 1 : 0.9 + Math.sin(t * 2.2 + i * 1.7 + def.phase) * 0.06 + Math.sin(t * 7.3 + i) * 0.03;
-      const base = 0.42 + (def.z + 3) * 0.06;
-      s.scale.setScalar(base * f);
-    });
+    if (group.current && !reduce) { group.current.position.y = Math.sin(t * 0.4 + def.phase) * 0.018; group.current.rotation.z = Math.sin(t * 0.33 + def.phase) * 0.004; }
   });
   return (
     <group ref={group}>
-      <primitive object={line} />
-      {bulbs.map((p, i) => (
-        <group key={i} position={p}>
-          <mesh>
-            <sphereGeometry args={[0.035, 12, 12]} />
-            <meshBasicMaterial color="#ffe6b0" toneMapped={false} />
-          </mesh>
-          <sprite ref={(s) => { if (s) halos.current[i] = s; }} scale={0.6}>
-            <spriteMaterial map={tex} transparent depthWrite={false} blending={THREE.AdditiveBlending} opacity={0.9} />
-          </sprite>
-        </group>
-      ))}
+      <mesh geometry={tube}>
+        <meshBasicMaterial color={INK} transparent opacity={0.6} />
+      </mesh>
+      {bulbs.map((p, i) => {
+        const color = CYCLE[(i + Math.round(def.phase * 3)) % CYCLE.length];
+        return (
+          <group key={i} position={p}>
+            <mesh position={[0, -0.04, 0]}>
+              <cylinderGeometry args={[def.r * 0.32, def.r * 0.32, 0.08, 10]} />
+              <meshStandardMaterial color={INK} roughness={0.6} />
+            </mesh>
+            <mesh position={[0, -0.08 - def.r, 0]}>
+              <sphereGeometry args={[def.r, 24, 24]} />
+              <meshStandardMaterial color={color} roughness={0.28} metalness={0} emissive={color} emissiveIntensity={0.18} />
+            </mesh>
+          </group>
+        );
+      })}
     </group>
   );
+}
+
+// Keep 1 world unit = 100 CSS px at z = 0 so bulbs stay the same size whatever the band's height.
+function Fit() {
+  const { camera, size } = useThree();
+  useLayoutEffect(() => {
+    const cam = camera as THREE.PerspectiveCamera;
+    cam.fov = (2 * Math.atan(size.height / PX_PER_UNIT / 2 / CAM_Z) * 180) / Math.PI;
+    cam.updateProjectionMatrix();
+  }, [camera, size]);
+  return null;
 }
 
 function Rig({ reduce }: { reduce: boolean }) {
   const { camera, pointer } = useThree();
   useFrame(() => {
     if (reduce) return;
-    camera.position.x += (pointer.x * 0.35 - camera.position.x) * 0.04;
-    camera.position.y += (pointer.y * 0.18 + 0.1 - camera.position.y) * 0.04;
-    camera.lookAt(0, 0.6, -2);
+    camera.position.x += (pointer.x * 0.3 - camera.position.x) * 0.04;
+    camera.position.y += (pointer.y * 0.08 - camera.position.y) * 0.04;
+    camera.lookAt(0, 0, 0);
   });
   return null;
 }
 
-function Scene({ reduce, small }: { reduce: boolean; small: boolean }) {
-  const tex = useMemo(glowTexture, []);
-  const strands: StrandDef[] = useMemo(() => {
-    const base: StrandDef[] = [
-      { y: 3.05, z: -3.2, sag: 0.5, span: 12, n: 22, phase: 0.2 },
-      { y: 2.75, z: -1.6, sag: 0.6, span: 10, n: 16, phase: 1.3 },
-      { y: 2.45, z: 0.2, sag: 0.45, span: 8.5, n: 13, phase: 2.1 },
-      { y: 3.5, z: -5.5, sag: 0.35, span: 15, n: 26, phase: 3.0 },
-    ];
-    return small ? base.slice(0, 3).map((s) => ({ ...s, n: Math.ceil(s.n * 0.6), span: s.span * 0.75 })) : base;
-  }, [small]);
+function Scene({ reduce }: { reduce: boolean }) {
+  const { size } = useThree();
+  const w = size.width / PX_PER_UNIT, h = size.height / PX_PER_UNIT;
+  const strands = size.width < 768 ? STRANDS.map((s) => ({ ...s, gap: s.gap * 0.8 })) : STRANDS;
   return (
     <>
+      <Fit />
       <Rig reduce={reduce} />
-      {strands.map((d, i) => <Strand key={i} def={d} tex={tex} reduce={reduce} />)}
+      <ambientLight intensity={1.35} />
+      <directionalLight position={[-2, 4, 6]} intensity={1.6} />
+      {strands.map((d, i) => <Strand key={i} def={d} w={w} h={h} reduce={reduce} />)}
     </>
   );
 }
 
 export default function StringLights() {
   const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const small = typeof window !== "undefined" && window.innerWidth < 768;
   return (
     <Canvas
-      dpr={[1, small ? 1.25 : 1.6]}
-      camera={{ position: [0, 0.1, 5], fov: 50 }}
+      flat
+      dpr={[1, 2]}
+      camera={{ position: [0, 0, CAM_Z], fov: 20 }}
       gl={{ alpha: true, antialias: true, powerPreference: "low-power" }}
       frameloop={reduce ? "demand" : "always"}
       style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
       aria-hidden
     >
-      <Scene reduce={reduce} small={small} />
+      <Scene reduce={reduce} />
     </Canvas>
   );
 }

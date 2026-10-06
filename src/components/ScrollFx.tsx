@@ -60,20 +60,29 @@ export default function ScrollFx() {
       // membership: pinned sequence that lights up each engine pillar in turn (desktop only)
       const mm = gsap.matchMedia();
       mm.add("(min-width: 1024px)", () => {
-        const sec = document.querySelector<HTMLElement>("[data-engine]");
+        const sec = document.querySelector<HTMLElement>("section[data-engine]"); // three.js also stamps data-engine on its canvas
         if (!sec) return;
         const cards = sec.querySelectorAll<HTMLElement>("[data-engine-card]");
         const tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: "top top", end: "+=" + cards.length * 520, pin: true, scrub: 0.6 } });
         cards.forEach((c, i) => {
-          if (i > 0) tl.fromTo(c, { yPercent: 105, opacity: 0.4 }, { yPercent: 0, opacity: 1, duration: 1, ease: "power2.out" });
-          tl.to(sec.querySelectorAll(`[data-engine-dot]`), { opacity: 0.25, duration: 0.2 }, "<").to(sec.querySelector(`[data-engine-dot="${i}"]`), { opacity: 1, duration: 0.2 }, "<");
+          // only the next card waits peeking under the active one; later cards (higher z-index) stay
+          // hidden until their turn, so the preview is always in order
+          if (i > 1) tl.fromTo(c, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12, immediateRender: true });
+          if (i > 0) tl.fromTo(c, { yPercent: 105 }, { yPercent: 0, duration: 1, ease: "power2.out" });
+          // progress pills: slate when waiting, Sundae red for the card on screen
+          tl.to(sec.querySelectorAll(`[data-engine-dot]`), { backgroundColor: "#c9d2e0", duration: 0.2 }, "<").to(sec.querySelector(`[data-engine-dot="${i}"]`), { backgroundColor: "#db3d55", duration: 0.2 }, "<");
         });
       });
     });
+    // mobile sticky CTA: hide it while the RSVP section is on screen so it never covers the form's buttons
+    const cta = document.querySelector<HTMLElement>("[data-sticky-cta]");
+    const rsvp = document.getElementById("rsvp");
+    const io = cta && rsvp ? new IntersectionObserver(([e]) => cta.setAttribute("data-hidden", String(e.isIntersecting))) : null;
+    if (io && rsvp) io.observe(rsvp);
     const nav = document.querySelector<HTMLElement>("[data-nav]");
     const onScroll = () => nav?.setAttribute("data-solid", String(window.scrollY > 40));
     window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
-    return () => { ctx.revert(); lenis?.destroy(); document.removeEventListener("click", onClick); window.removeEventListener("scroll", onScroll); };
+    return () => { ctx.revert(); io?.disconnect(); lenis?.destroy(); document.removeEventListener("click", onClick); window.removeEventListener("scroll", onScroll); };
   }, []);
   return null;
 }
